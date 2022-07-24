@@ -23,6 +23,11 @@
   <!-- sidebar menu: : style can be found in sidebar.less -->
   <ul class="sidebar-menu" data-widget="tree">
     <li class="header">MAIN NAVIGATION</li>
+    <li class="{{($urlactive == 'order') ? 'active' : ''}}">
+      <a href="{{url('order')}}">
+        <i class="fa fa-users"></i> <span>Order</span>
+      </a>
+    </li>
     <li class="{{($urlactive == 'category') ? 'active' : ''}}">
       <a href="{{url('category')}}">
         <i class="fa fa-users"></i> <span>Category</span>

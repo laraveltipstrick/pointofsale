@@ -1,0 +1,45 @@
+.fixed-table-head {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: 100% !important;
+}
+.fixed-table-head .table {
+    margin: 0;
+}
+.list-selected {
+    min-height: 160px;
+}
+.wrap-product {
+    position: relative
+}
+.selected-product .form-control {
+    height: auto;
+}
+.list-product .product button {
+    /* margin-right: 5px;
+    margin-bottom: 5px; */
+    background: 0 0;
+    padding: 3px;
+}
+.list-product .product .product-image {
+    display: block;
+    background-color: white;
+    padding: 3px;
+}
+.list-product .product .product-image img {
+    width: 100px;
+    height: 100px;
+}
+
+.list-product .product .product-title {
+    display: block;
+    background-color: #e5e5e5;
+    padding: 3px;
+}
+.btn-bill {
+    display: flex;
+}
+.btn-bill button {
+    flex: 1;
+}

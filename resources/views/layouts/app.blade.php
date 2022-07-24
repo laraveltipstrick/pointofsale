@@ -68,12 +68,15 @@
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>
-        {{$title ?? 'title'}}
-        <small>{{$desc ?? 'desc'}}</small>
-      </h1>
-    </section>
+
+    @section('content-header')
+      <section class="content-header">
+        <h1>
+          {{$title ?? 'title'}}
+          <small>{{$desc ?? 'desc'}}</small>
+        </h1>
+      </section>
+    @show
 
     <!-- Main content -->
     <section class="content">
@@ -96,6 +99,7 @@
 <script src="{{ asset('AdminLTE-2.4.15/bower_components/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
 <!-- FastClick -->
 <script src="{{ asset('AdminLTE-2.4.15/bower_components/fastclick/lib/fastclick.js') }}"></script>
+@stack('home')
 <!-- AdminLTE App -->
 <script src="{{ asset('AdminLTE-2.4.15/dist/js/adminlte.min.js') }}"></script>
 <!-- AdminLTE for demo purposes -->

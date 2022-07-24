@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,11 @@ Route::get('/', function () {
 Route::post('/auth', [AuthController::class, 'auth']);
 
 Route::group(['middleware' => ['auth']], function () {
+    Route::get('home', function () {
+        return view('home.index');
+    })->name('home');
+
+    Route::get('order', [OrderController::class, 'index'])->name('order.index');
     Route::get('category/data', [CategoryController::class, 'data'])->name('category.data');
     Route::resource('category', CategoryController::class);
     
