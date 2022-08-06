@@ -4,6 +4,7 @@
 @endsection
 
 @push('scripts')
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         $('.list-selected').slimScroll({
             height: '250px'
@@ -58,6 +59,10 @@
                                             <th style="width: 20px;"></th>
                                         </tr>
                                     </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+<!--                                     
                                     <tbody>
                                         <tr>
                                             <td>Ayam Bakar</td>
@@ -147,7 +152,8 @@
                                                 <i class="fa fa-trash-o"></i>
                                             </td>
                                         </tr>
-                                    </tbody>
+                                    </tbody> -->
+
                                 </table>
                             </div>
                             <div class="form-group clearfix">
