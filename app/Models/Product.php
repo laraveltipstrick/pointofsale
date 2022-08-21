@@ -18,7 +18,6 @@ class Product extends Model
         'price',
         'quantity',
         'description',
-        'has_variant',
         'status'
     ];
 
@@ -27,8 +26,4 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function variant()
-    {
-        return $this->hasMany(Variant::class);
-    }
 }

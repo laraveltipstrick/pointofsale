@@ -43,3 +43,6 @@
 .btn-bill button {
     flex: 1;
 }
+.button-item {
+    text-align: left !important;
+}

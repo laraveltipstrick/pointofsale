@@ -36,6 +36,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('category/data', [CategoryController::class, 'data'])->name('category.data');
     Route::resource('category', CategoryController::class);
     
+    Route::get('products/items', [ProductController::class, 'items'])->name('products.items');
     Route::get('products/data', [ProductController::class, 'data'])->name('products.data');
     Route::resource('products', ProductController::class);
 

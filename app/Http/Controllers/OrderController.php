@@ -20,7 +20,8 @@ class OrderController extends Controller
     {
         $data['title'] = $this->title;
         $data['desc'] = 'List';
-        $data['products'] = Product::latest()->get();
+        $data['products'] = collect(Product::latest()->get())->toJson();
+        // $data['products'] = Product::latest()->get();
         return view($this->folder.'.index', $data);
     }
 }

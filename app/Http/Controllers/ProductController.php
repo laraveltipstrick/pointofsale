@@ -32,9 +32,9 @@ class ProductController extends Controller
     public function data(Request $request)
     {
         if (!$request->ajax()) { return; }
-        $data = $this->table->with('variant')->select([
+        $data = $this->table->select([
             'id', 'category_id', 'name', 'barcode', 
-            'image', 'cost', 'price', 'quantity', 'has_variant'
+            'image', 'cost', 'price', 'quantity'
         ]);
         // ->orderBy('id', 'desc');
         // $data = $this->table->with('variant')->withSum('variant', 'quantity')->get();
@@ -46,10 +46,10 @@ class ProductController extends Controller
             return ($index->image != null) ? "<img width='32' height='32' src='uploads/$index->image'/>" : '-';
         })
         ->editColumn('cost', function ($index) {
-            return ($index->has_variant) ? "<a href='javascript:void(0)' data-product='$index->name' data-variant='$index->variant' class='btn btn-warning btn-xs view-variant'>View Variant</a>" : $index->cost;
+            return $index->cost;
         })
         ->editColumn('price', function ($index) {
-            return ($index->has_variant) ? "<a href='javascript:void(0)' data-product='$index->name' data-variant='$index->variant' class='btn btn-warning btn-xs view-variant'>View Variant</a>" : $index->price;
+            return $index->price;
         })
         ->editColumn('quantity', function ($index) {
             return ($index->has_variant) ? $index->variant->sum('quantity') : $index->quantity;
@@ -151,5 +151,11 @@ class ProductController extends Controller
         $tb->delete();
         Storage::disk('public_upload')->delete($tb->image);
         return redirect(route($this->uri.'.index'))->with('success', trans('message.delete'));
+    }
+
+    public function items()
+    {
+        $products = Product::latest()->get();
+        return response()->json($products);
     }
 }

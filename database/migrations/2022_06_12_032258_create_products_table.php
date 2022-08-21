@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('price')->nullable();
             $table->integer('quantity')->default(0); // Stock
             $table->text('description')->nullable();
-            $table->boolean('has_variant')->default(0);
+            // $table->boolean('has_variant')->default(0);
             $table->boolean('status')->default(1);
             $table->timestamps();
         });
