@@ -25,11 +25,19 @@
                 tax: 0,
                 discount: 0,
                 selectedItems: [],
-                get listItems() {
-                    return this.items.filter(
-                        i => i.name.toLowerCase().startsWith(this.search.toLowerCase())
-                        //i => i.name.toLowerCase().startsWith((this.search)?this.search.toLowerCase():null)
-                    )
+                category: 0,
+                //get listItems() {
+                listItems() {
+                    if(this.category > 0) {
+                        return this.items.filter(
+                            i => i.name.toLowerCase().startsWith(this.search.toLowerCase()) 
+                            && i.category_id == this.category
+                        )
+                    } else {
+                        return this.items.filter(
+                            i => i.name.toLowerCase().startsWith(this.search.toLowerCase()) 
+                        )
+                    }
                 },
                 selectItem(item) {
                     var index = this.selectedItems.findIndex(i => i.id === item.id);
@@ -48,9 +56,12 @@
                         this.selectedItems[index].sub_price = sub_price
                         //console.log(this.selectedItems[index].qty)
                     }
-                    this.tax = this.calculatePercentage(this.input.tax)
-                    this.discount = this.calculatePercentage(this.input.discount)
-                    //console.log(this.selectedItems)
+                    //this.tax = this.calculateTax(this.input.tax)
+                    //this.discount = this.calculateDiscount(this.input.discount)
+
+                    //console.log('calculate discount: '+this.calculateDiscount(this.input.discount))
+                    //console.log('discount: '+this.discount)
+                    //console.log('tax: '+this.tax)
                 },
                 updateQty(event, index) {
                     //if(!(event.which < 48 || event.which > 57)) {
@@ -63,14 +74,14 @@
                     this.selectedItems[index].qty = parseInt(event.target.value)
                     this.selectedItems[index].sub_price = parseInt(event.target.value) * this.selectedItems[index].price
                     //console.log(this.selectedItems)
-                    this.tax = this.calculatePercentage(this.input.tax)
-                    this.discount = this.calculatePercentage(this.input.discount)
+                    //this.tax = this.calculateTax(this.input.tax)
+                    //this.discount = this.calculateDiscount(this.input.discount)
                 },
                 removeItem(index) {
                     //var index = this.selectedItems.findIndex(i => i.id === item.id);
                     this.selectedItems.splice(index, 1)
-                    this.tax = this.calculatePercentage(this.input.tax)
-                    this.discount = this.calculatePercentage(this.input.discount)
+                    //this.tax = this.calculateTax(this.input.tax)
+                    //this.discount = this.calculateDiscount(this.input.discount)
                 },
                 lengthItem() {
                     return this.selectedItems.length
@@ -90,7 +101,8 @@
                             return b.sub_price + a
                         }, 0)
                         //this.lastTotal = (parseInt(sub_total) - parseInt(this.discount)) + parseInt(this.tax)
-                        return (parseInt(sub_total) - parseInt(this.discount)) + parseInt(this.tax)
+                        //return (parseInt(sub_total) - parseInt(this.discount)) + parseInt(this.tax)
+                        return (parseFloat(sub_total) - parseFloat(this.getDiscount())) + parseFloat(this.getTax())
                     } else {
                         return 0;
                     }
@@ -111,7 +123,7 @@
                     $('#modal-discount').modal('show')
                 },
                 updateTax() {
-                    this.tax = this.calculatePercentage(this.input.tax)
+                    //this.tax = this.calculateTax(this.input.tax)
                     /*var inputTax = this.input.tax
                     if(inputTax != 0 && inputTax.slice(-1) == '%') {
                         this.tax = (parseInt(inputTax)/100) * this.sumItem()
@@ -127,10 +139,10 @@
                     } else {
                         this.discount = parseInt(inputDiscount)
                     }*/
-                    this.discount = this.calculatePercentage(this.input.discount)
+                    //this.discount = this.calculateDiscount(this.input.discount)
                     $('#modal-discount').modal('hide')
                 },
-                calculatePercentage(value) {
+                calculateDiscount(value) {
                     var inputPercentage = value
                     if(inputPercentage != 0 && inputPercentage.slice(-1) == '%') {
                         return (parseInt(inputPercentage)/100) * this.sumItem()
@@ -138,8 +150,46 @@
                         return parseInt(inputPercentage)
                     }
                 },
+                calculateTax(value) {
+                    var inputPercentage = value
+                    if(inputPercentage != 0 && inputPercentage.slice(-1) == '%') {
+                        //return (parseInt(inputPercentage)/100) * this.sumItem()
+                        return (parseInt(inputPercentage)/100) * (this.sumItem() - this.calculateDiscount(this.input.discount))
+                    } else {
+                        return parseInt(inputPercentage)
+                    }
+                },
                 getTax() {
-
+                    const inputPercentage = this.input.tax
+                    if(inputPercentage != 0 && inputPercentage.slice(-1) == '%') {
+                        //return (parseInt(inputPercentage)/100) * this.sumItem()
+                        return ((parseInt(inputPercentage)/100) * (this.sumItem() - this.getDiscount())).toFixed(2)
+                    } else {
+                        return parseInt(inputPercentage)
+                    }
+                },
+                getDiscount() {
+                    const inputPercentage = this.input.discount
+                    if(inputPercentage != 0 && inputPercentage.slice(-1) == '%') {
+                        return ((parseInt(inputPercentage)/100) * this.sumItem()).toFixed(2)
+                    } else {
+                        return parseInt(inputPercentage)
+                    }
+                },
+                limitCharacter(name) {
+                    if(name.length > 10) {
+                        return name.substring(0, 10) + ' ...'
+                    } else {
+                        return name
+                    }
+                },
+                /*listItemBasedOnCategory() {
+                    if(this.category > 0) {
+                        return this.listItems();
+                    }
+                },*/
+                selectCategory(categoryId) {
+                    this.category = categoryId
                 }
 
             }))
@@ -160,8 +210,9 @@
                     <div class="box-body">
                         <div class="form-group">
                             <select class="form-control" name="sale_type">
-                                <option value="1">Dine In</option>
-                                <option value="2">Take Away</option>
+                                @foreach($sales_type as $key => $value)
+                                    <option value="{{$value->id}}">{{$value->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <!-- <div class="form-group">
@@ -226,12 +277,12 @@
                                     <tr>
                                         <td colspan="2"></td>
                                         <td><a href="javascript:void(0)" @click="addDiscount">Discount</a></td>
-                                        <td class="text-right" x-text="discount"></td>
+                                        <td class="text-right" x-text="getDiscount"></td>
                                     </tr>
                                     <tr>
                                         <td colspan="2"></td>
                                         <td><a href="javascript:void(0)" @click="addTax">Tax</a></td>
-                                        <td class="text-right" x-text="tax"></td>
+                                        <td class="text-right" x-text="getTax"></td>
                                     </tr>
                                     <tr>
                                         <td colspan="2"></td>
@@ -268,6 +319,16 @@
                     </div>
                 </div>
             </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary btn-sm" @click="selectCategory(0)">All Category</button>
+                    @foreach($category as $key => $value)
+                        <button type="button" class="btn btn-primary btn-sm" @click="selectCategory({{$value->id}})">{{$value->name}}</button>
+                    @endforeach
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="list-product">
@@ -277,7 +338,7 @@
                                     <span class="product-image">
                                         <img :src="item.image ? 'uploads/'+item.image : '/assets/img/no-image.png'" alt="">
                                     </span>
-                                    <span class="product-title" x-text="item.name"></span>
+                                    <span class="product-title" x-text="limitCharacter(item.name)"></span>
                                 </button>
                             </template>
                             {{--@foreach($products as $product)
@@ -310,8 +371,8 @@
                             <input type="text" class="form-control input-sm" x-model="input.tax" onClick="this.select();"/>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left btn-sm" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                            {{-- <button type="button" class="btn btn-default pull-left btn-sm btn-block" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Save</button> --}}
                         </div>
                     </form>
                 </div>
@@ -330,8 +391,8 @@
                             <input type="text" class="form-control input-sm" x-model="input.discount" onClick="this.select();"/>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left btn-sm" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                            {{-- <button type="button" class="btn btn-default pull-left btn-sm btn-block" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Save</button> --}}
                         </div>
                     </form>
                 </div>

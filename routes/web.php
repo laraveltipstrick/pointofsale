@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SalesTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,12 +34,16 @@ Route::group(['middleware' => ['auth']], function () {
     })->name('home');
 
     Route::get('order', [OrderController::class, 'index'])->name('order.index');
+    
     Route::get('category/data', [CategoryController::class, 'data'])->name('category.data');
     Route::resource('category', CategoryController::class);
     
     Route::get('products/items', [ProductController::class, 'items'])->name('products.items');
     Route::get('products/data', [ProductController::class, 'data'])->name('products.data');
     Route::resource('products', ProductController::class);
+
+    Route::get('sales_type/data', [SalesTypeController::class, 'data'])->name('sales_type.data');
+    Route::resource('sales_type', SalesTypeController::class);
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

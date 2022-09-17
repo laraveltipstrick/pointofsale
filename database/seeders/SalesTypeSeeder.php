@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Category;
+use App\Models\SalesType;
 
-class CategorySeeder extends Seeder
+class SalesTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,10 +15,11 @@ class CategorySeeder extends Seeder
      */
     public function run()
     {
-        Category::truncate();
-        $types = ['Food', 'Hot Coffee', 'Cold Coffee', 'Cake', 'Desserts', 'Soup & Salad', 'Drink', 'Snack'];
+        SalesType::truncate();
+
+        $types = ['Dine In', 'Take Away', 'Delivery Service'];
         foreach ($types as $key => $value) {
-            Category::insert([
+            SalesType::insert([
                 'name' => $value,
                 'created_at' => now(), 
                 'updated_at' => now()

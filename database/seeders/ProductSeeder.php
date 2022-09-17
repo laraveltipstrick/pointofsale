@@ -20,14 +20,20 @@ class ProductSeeder extends Seeder
         Product::truncate();
         $category = Category::pluck('id');
         $faker = Faker::create();
-        
-        for ($i=0; $i < 20; $i++) { 
-            $variant = rand(0, 1);
+
+        $food = ['Fried Rice', 'Spring Rolls', 'Egg Roll', 'Mozzarella Stick', 'Chicken Garlic', 'Chicken Nugget'];
+        $hotCoffee = ['Americano', 'Espresso', 'Cappucino', 'Latte Machiato', 'Vanilla Latte', 'Hazelnut Latte', 'Hot Red Velvet'];
+        $coldCoffee = ['Ice Cafe Latte', 'Ice Watermelon Latte', 'Ice Americano', 'Ice Coconut Espresso', 'Ice Mochaccino'];
+        $cake = ['Banana Pudding', 'Sweet Vanila', 'Cheesecake', 'Donuts Chocolate', 'Chocolate Brownies'];
+        $dessert = ['Classic Vanilla Gelato', 'Limoncello Gelato', 'Strawberry Cheese Cake', 'Chocolate Lava Cake', 'Red Velvet', 'Fruit Compole'];
+        $soupSalad = ['Red Pepper Soup', 'Mushroom & Chicken Soup', 'Clam Chowder', 'Crab Soup'];
+        $drink = ['Chocolate', 'Matcha', 'Hazelnut', 'Caramel', 'Guava Juice', 'Strawberry', 'Lemon Tea'];
+
+        foreach ($food as $key => $value) {
             Product::insert([
-                'category_id' => $faker->randomElement($category),
-                'name' => $faker->firstName(),
+                'category_id' => $category[0],
+                'name' => $value,
                 'barcode' => $faker->ean13(),
-                // 'sku' => $faker->randomNumber(5, true),
                 'price' => 10 * $faker->randomDigitNotNull(),
                 'cost' => 3 * $faker->randomDigitNotNull(),
                 'quantity' => $faker->randomNumber(2, true),
@@ -35,6 +41,98 @@ class ProductSeeder extends Seeder
                 'status' => rand(0, 1),
             ]);
         }
+
+        foreach ($hotCoffee as $key => $value) {
+            Product::insert([
+                'category_id' => $category[1],
+                'name' => $value,
+                'barcode' => $faker->ean13(),
+                'price' => 10 * $faker->randomDigitNotNull(),
+                'cost' => 3 * $faker->randomDigitNotNull(),
+                'quantity' => $faker->randomNumber(2, true),
+                'description' => $faker->sentence(),
+                'status' => rand(0, 1),
+            ]);
+        }
+
+        foreach ($coldCoffee as $key => $value) {
+            Product::insert([
+                'category_id' => $category[2],
+                'name' => $value,
+                'barcode' => $faker->ean13(),
+                'price' => 10 * $faker->randomDigitNotNull(),
+                'cost' => 3 * $faker->randomDigitNotNull(),
+                'quantity' => $faker->randomNumber(2, true),
+                'description' => $faker->sentence(),
+                'status' => rand(0, 1),
+            ]);
+        }
+
+        foreach ($cake as $key => $value) {
+            Product::insert([
+                'category_id' => $category[3],
+                'name' => $value,
+                'barcode' => $faker->ean13(),
+                'price' => 10 * $faker->randomDigitNotNull(),
+                'cost' => 3 * $faker->randomDigitNotNull(),
+                'quantity' => $faker->randomNumber(2, true),
+                'description' => $faker->sentence(),
+                'status' => rand(0, 1),
+            ]);
+        }
+
+        foreach ($dessert as $key => $value) {
+            Product::insert([
+                'category_id' => $category[4],
+                'name' => $value,
+                'barcode' => $faker->ean13(),
+                'price' => 10 * $faker->randomDigitNotNull(),
+                'cost' => 3 * $faker->randomDigitNotNull(),
+                'quantity' => $faker->randomNumber(2, true),
+                'description' => $faker->sentence(),
+                'status' => rand(0, 1),
+            ]);
+        }
+
+        foreach ($soupSalad as $key => $value) {
+            Product::insert([
+                'category_id' => $category[5],
+                'name' => $value,
+                'barcode' => $faker->ean13(),
+                'price' => 10 * $faker->randomDigitNotNull(),
+                'cost' => 3 * $faker->randomDigitNotNull(),
+                'quantity' => $faker->randomNumber(2, true),
+                'description' => $faker->sentence(),
+                'status' => rand(0, 1),
+            ]);
+        }
+
+        foreach ($drink as $key => $value) {
+            Product::insert([
+                'category_id' => $category[6],
+                'name' => $value,
+                'barcode' => $faker->ean13(),
+                'price' => 10 * $faker->randomDigitNotNull(),
+                'cost' => 3 * $faker->randomDigitNotNull(),
+                'quantity' => $faker->randomNumber(2, true),
+                'description' => $faker->sentence(),
+                'status' => rand(0, 1),
+            ]);
+        }
+        // for ($i=0; $i < 20; $i++) { 
+        //     $variant = rand(0, 1);
+        //     Product::insert([
+        //         'category_id' => $faker->randomElement($category),
+        //         'name' => $faker->firstName(),
+        //         'barcode' => $faker->ean13(),
+        //         // 'sku' => $faker->randomNumber(5, true),
+        //         'price' => 10 * $faker->randomDigitNotNull(),
+        //         'cost' => 3 * $faker->randomDigitNotNull(),
+        //         'quantity' => $faker->randomNumber(2, true),
+        //         'description' => $faker->sentence(),
+        //         'status' => rand(0, 1),
+        //     ]);
+        // }
 
         // $pro = Product::where('has_variant', 1)->get();
 
