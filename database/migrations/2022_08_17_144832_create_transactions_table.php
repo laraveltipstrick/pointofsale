@@ -15,9 +15,13 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->integer('sales_type_id')->default(0);
             $table->integer('user_id');
+            $table->integer('customer_id')->default(0);
+            $table->string('name')->nullable();
             $table->integer('total');
-            $table->integer('payment_id');
+            $table->integer('payment_id')->default(0);
+            $table->boolean('status')->default(0); // 0. Pending, 1. Selesai
             $table->timestamps();
         });
     }

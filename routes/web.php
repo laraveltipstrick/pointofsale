@@ -18,9 +18,24 @@ use App\Http\Controllers\SalesTypeController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+Route::get('/test', function () {
+    // return view('welcome');
+    // $collection = collect(['Java', 'Python', 'PHP', 'C#']);
+ 
+    // $reversed = $collection->reverse();
+    
+    // $reversed->all();
+
+    $collection = collect([
+        10 => ['product' => 'Desk', 'price' => 200],
+        15 => ['product' => 'Desk', 'price' => 200],
+    ]);
+     
+    $values = $collection->values();
+     
+    dd($values->all());
+    
+});
 
 Route::get('/', function () {
     return view('auth.login');
@@ -34,6 +49,8 @@ Route::group(['middleware' => ['auth']], function () {
     })->name('home');
 
     Route::get('order', [OrderController::class, 'index'])->name('order.index');
+    Route::get('billing_list', [OrderController::class, 'billing_list'])->name('order.billing.list');
+    Route::get('billing_select/{transaction_id}', [OrderController::class, 'billing_select']);
     
     Route::get('category/data', [CategoryController::class, 'data'])->name('category.data');
     Route::resource('category', CategoryController::class);

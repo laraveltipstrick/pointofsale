@@ -4,6 +4,7 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('AdminLTE-2.4.15/dist/js/moment.js') }}"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         $('.list-selected').slimScroll({
@@ -17,6 +18,7 @@
             Alpine.data('products', () => ({
                 search: '',
                 items: {!!$products!!},
+                billingList: {},
                 input: {
                     tax: 0,
                     discount: 0
@@ -122,6 +124,12 @@
                 addDiscount() {
                     $('#modal-discount').modal('show')
                 },
+                //showBillingList() {
+                //    $('#modal-billing-list').modal('show')
+                //},
+                saveBill() {
+                    $('#modal-save-bill').modal('show')
+                },
                 updateTax() {
                     //this.tax = this.calculateTax(this.input.tax)
                     /*var inputTax = this.input.tax
@@ -190,6 +198,26 @@
                 },*/
                 selectCategory(categoryId) {
                     this.category = categoryId
+                },
+                async retrieveBillingList() {
+                    $('#modal-billing-list').modal('show')
+                    this.billingList = await(await fetch("{{route('order.billing.list')}}")).json();
+                    // console.log(this.billingList);
+                },
+                async selectBillingList(transactionId) {
+                    let billing = await(await fetch("{{url('billing_select')}}/"+transactionId)).json();
+                    billing.forEach((element, index, array) => {
+                        //console.log(element.name)
+                        const container = {}
+                        container.id = element.id
+                        container.name = element.name
+                        container.price = element.price
+                        container.image = null
+                        container.qty = element.quantity
+                        container.sub_price = (element.price * element.quantity)
+                        this.selectedItems.push(container)
+                    })
+                    $('#modal-billing-list').modal('hide')
                 }
 
             }))
@@ -209,7 +237,19 @@
                 @csrf
                     <div class="box-body">
                         <div class="form-group">
-                            <select class="form-control" name="sale_type">
+                            <div class="btn-group btn-block btn-bill">
+                                <button type="button" @click="retrieveBillingList" class="btn btn-primary btn-flat">
+                                    <i class="fa fa-fw fa-list"></i>
+                                    Billing List
+                                </button>
+                                <button type="button" class="btn btn-primary btn-flat">
+                                    <i class="fa fa-fw fa-plus"></i>
+                                    Add Customer
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <select class="form-control" name="sales_type">
                                 @foreach($sales_type as $key => $value)
                                     <option value="{{$value->id}}">{{$value->name}}</option>
                                 @endforeach
@@ -295,7 +335,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="btn-group btn-block btn-bill">
-                                            <button type="button" class="btn btn-primary btn-flat">Save Bill</button>
+                                            <button type="button" @click="saveBill" class="btn btn-primary btn-flat">Save Bill</button>
                                             <button type="button" class="btn btn-warning btn-flat">Print Bill</button>
                                         </div>
                                     </div>
@@ -395,6 +435,71 @@
                             <button type="submit" class="btn btn-primary btn-sm">Save</button> --}}
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal-save-bill">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <form @submit.prevent="saveBill">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Save Bill</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input type="text" class="form-control input-sm" placeholder="Name" onClick="this.select();"/>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left btn-sm" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal-billing-list">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Billing List</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Billing Name</th>
+                                    <th>Total</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="(item, index) in billingList" :key="index">
+                                    <tr @click="selectBillingList(item.id)">
+                                        <td x-text="item.name"></td>
+                                        <td x-text="item.total"></td>
+                                        <td x-text="moment(item.created_at).fromNow()"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                            {{-- <tr>
+                                <td>1.</td>
+                                <td>Update software</td>
+                                <td>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-red">55%</span></td>
+                            </tr> --}}
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                        {{-- <button type="button" class="btn btn-primary">Save changes</button> --}}
+                    </div>
                 </div>
             </div>
         </div>

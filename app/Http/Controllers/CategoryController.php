@@ -30,9 +30,7 @@ class CategoryController extends Controller
     public function data(Request $request)
     {
         if (!$request->ajax()) { return; }
-        $data = $this->table->withCount(['products'])->select([
-            'id', 'name', 'created_at'
-        ]);
+        $data = $this->table->withCount(['products']);
         return DataTables::of($data)
         ->editColumn('created_at', function ($index) {
             return isset($index->created_at) ? $index->created_at->format('d F Y H:i:s') : '-';
