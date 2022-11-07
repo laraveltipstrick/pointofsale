@@ -119,16 +119,28 @@
                     }
                 },
                 addTax() {
-                    $('#modal-tax').modal('show')
+                    if (this.selectedItems.length > 0) {
+                        $('#modal-tax').modal('show')
+                    } else {
+                        alert('Please select at less one product')
+                    }
                 },
                 addDiscount() {
-                    $('#modal-discount').modal('show')
+                    if (this.selectedItems.length > 0) {
+                        $('#modal-discount').modal('show')
+                    } else {
+                        alert('Please select at less one product')
+                    }
                 },
                 //showBillingList() {
                 //    $('#modal-billing-list').modal('show')
                 //},
                 saveBill() {
-                    $('#modal-save-bill').modal('show')
+                    if (this.selectedItems.length > 0) {
+                        $('#modal-save-bill').modal('show')
+                    } else {
+                        alert('Please select at less one product')
+                    }
                 },
                 updateTax() {
                     //this.tax = this.calculateTax(this.input.tax)
@@ -205,6 +217,7 @@
                     // console.log(this.billingList);
                 },
                 async selectBillingList(transactionId) {
+                    this.selectedItems = []
                     let billing = await(await fetch("{{url('billing_select')}}/"+transactionId)).json();
                     billing.forEach((element, index, array) => {
                         //console.log(element.name)
@@ -218,10 +231,16 @@
                         this.selectedItems.push(container)
                     })
                     $('#modal-billing-list').modal('hide')
+                },
+                storeBill() {
+                    console.log(this.selectedItems)
                 }
 
             }))
         })
+        $('.modal').on('shown.bs.modal', function() {
+                $(this).find('[autofocus]').focus();
+            })
     </script>
 @endpush
 
@@ -448,11 +467,11 @@
                             <h4 class="modal-title">Save Bill</h4>
                         </div>
                         <div class="modal-body">
-                            <input type="text" class="form-control input-sm" placeholder="Name" onClick="this.select();"/>
+                            <input type="text" class="form-control input-sm" placeholder="Name" onClick="this.select();" autofocus/>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left btn-sm" data-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                            <button type="submit" class="btn btn-primary btn-sm" @click="storeBill">Save</button>
                         </div>
                     </form>
                 </div>
