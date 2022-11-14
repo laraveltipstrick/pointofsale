@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth']], function () {
     })->name('home');
 
     Route::get('order', [OrderController::class, 'index'])->name('order.index');
+    Route::post('order', [OrderController::class, 'store'])->name('order.store');
     Route::get('billing_list', [OrderController::class, 'billing_list'])->name('order.billing.list');
     Route::get('billing_select/{transaction_id}', [OrderController::class, 'billing_select']);
     

@@ -6,6 +6,7 @@
 @push('scripts')
     <script src="{{ asset('AdminLTE-2.4.15/dist/js/moment.js') }}"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $('.list-selected').slimScroll({
             height: '250px'
@@ -14,14 +15,30 @@
             height: '500px'
         })
 
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        })
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('products', () => ({
                 search: '',
                 items: {!!$products!!},
                 billingList: {},
                 input: {
+                    transaction_id: 0,
+                    sales_type: 0,
+                    customer_name: '',
                     tax: 0,
-                    discount: 0
+                    discount: 0,
+                    total: 0,
                 },
                 lastTotal: 0,
                 tax: 0,
@@ -104,7 +121,7 @@
                         }, 0)
                         //this.lastTotal = (parseInt(sub_total) - parseInt(this.discount)) + parseInt(this.tax)
                         //return (parseInt(sub_total) - parseInt(this.discount)) + parseInt(this.tax)
-                        return (parseFloat(sub_total) - parseFloat(this.getDiscount())) + parseFloat(this.getTax())
+                        return this.input.total = (parseFloat(sub_total) - parseFloat(this.getDiscount())) + parseFloat(this.getTax())
                     } else {
                         return 0;
                     }
@@ -122,25 +139,39 @@
                     if (this.selectedItems.length > 0) {
                         $('#modal-tax').modal('show')
                     } else {
-                        alert('Please select at less one product')
+                        return Toast.fire({
+                            icon: 'warning',
+                            title: 'You have to select product first'
+                        })
                     }
                 },
                 addDiscount() {
                     if (this.selectedItems.length > 0) {
                         $('#modal-discount').modal('show')
                     } else {
-                        alert('Please select at less one product')
+                        return Toast.fire({
+                            icon: 'warning',
+                            title: 'You have to select product first'
+                        })
                     }
                 },
                 //showBillingList() {
                 //    $('#modal-billing-list').modal('show')
                 //},
                 saveBill() {
-                    if (this.selectedItems.length > 0) {
-                        $('#modal-save-bill').modal('show')
-                    } else {
-                        alert('Please select at less one product')
+                    if (this.selectedItems.length == 0) {
+                        return Toast.fire({
+                            icon: 'warning',
+                            title: 'You have to select product first'
+                        })
                     }
+                    if (this.input.sales_type == 0) {
+                        return Toast.fire({
+                            icon: 'warning',
+                            title: 'Please select sales type'
+                        })
+                    }
+                    $('#modal-save-bill').modal('show')
                 },
                 updateTax() {
                     //this.tax = this.calculateTax(this.input.tax)
@@ -219,7 +250,7 @@
                 async selectBillingList(transactionId) {
                     this.selectedItems = []
                     let billing = await(await fetch("{{url('billing_select')}}/"+transactionId)).json();
-                    billing.forEach((element, index, array) => {
+                    billing.products.forEach((element, index, array) => {
                         //console.log(element.name)
                         const container = {}
                         container.id = element.id
@@ -230,10 +261,38 @@
                         container.sub_price = (element.price * element.quantity)
                         this.selectedItems.push(container)
                     })
+
+                    this.input.sales_type = billing.sales_type_id
+                    this.input.customer_name = billing.customer_name
+                    this.input.tax = billing.tax
+                    this.input.discount = billing.discount
+                    this.input.transaction_id = billing.id
+                    
                     $('#modal-billing-list').modal('hide')
                 },
-                storeBill() {
-                    console.log(this.selectedItems)
+                newData: {},
+                async storeBill() {
+                    this.newData = await (await fetch('{{$url_store}}', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            item: this.selectedItems,
+                            additional: this.input,
+                        }),
+                        headers: {
+                            'Content-type': 'application/json; charset=UTF-8',
+                            'X-CSRF-TOKEN': document.head.querySelector('meta[name=csrf-token]').content
+                        },
+                    })).json();
+                    if (this.newData) {
+                        this.selectedItems = []
+                        this.input.sales_type = 0
+                        this.input.customer_name = ''
+                        this.input.tax = 0
+                        this.input.discount = 0
+                        this.input.total = 0
+                        $('#modal-save-bill').modal('hide')
+                    }
+                    console.log(this.newData)
                 }
 
             }))
@@ -268,7 +327,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <select class="form-control" name="sales_type">
+                            <select class="form-control" x-model="input.sales_type" name="sales_type">
+                                <option value="0">- Please Select Sale Type -</option>
                                 @foreach($sales_type as $key => $value)
                                     <option value="{{$value->id}}">{{$value->name}}</option>
                                 @endforeach
@@ -310,11 +370,11 @@
                                                     {{-- <button type="button" @click="openModal(item)" class="btn btn-success btn-block btn-xs button-item" x-text="item.name">
                                                     </button> --}}
                                                 </td>
-                                                <td class="text-right" x-text="item.price"></td>
+                                                <td class="text-center" x-text="item.price"></td>
                                                 <td>
                                                     <input type="text" class="form-control no-padding text-center" x-on:keyup="updateQty($event, index)" :value="item.qty" onClick="this.select();">
                                                 </td>
-                                                <td class="text-right" x-text="item.sub_price"></td>
+                                                <td class="text-center" x-text="item.sub_price"></td>
                                                 <td>
                                                     <a href="javascript:void(0)" x-on:click="removeItem(index)">
                                                         <i class="fa fa-trash-o"></i>
@@ -393,7 +453,7 @@
                     <div class="list-product">
                         <div class="product">
                             <template x-for="item in listItems" :key="item.id">
-                                <button class="btn btn-flat" @click="selectItem(item)">
+                                <button class="btn btn-flat" @click="selectItem(item)" :title="item.name">
                                     <span class="product-image">
                                         <img :src="item.image ? 'uploads/'+item.image : '/assets/img/no-image.png'" alt="">
                                     </span>
@@ -467,7 +527,7 @@
                             <h4 class="modal-title">Save Bill</h4>
                         </div>
                         <div class="modal-body">
-                            <input type="text" class="form-control input-sm" placeholder="Name" onClick="this.select();" autofocus/>
+                            <input type="text" class="form-control input-sm" placeholder="Name" x-model="input.customer_name" onClick="this.select();" autofocus/>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left btn-sm" data-dismiss="modal">Cancel</button>
@@ -491,15 +551,17 @@
                                 <tr>
                                     <th>Billing Name</th>
                                     <th>Total</th>
-                                    <th>Time</th>
+                                    <th>Created At</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="(item, index) in billingList" :key="index">
-                                    <tr @click="selectBillingList(item.id)">
+                                    <tr>
                                         <td x-text="item.name"></td>
                                         <td x-text="item.total"></td>
                                         <td x-text="moment(item.created_at).fromNow()"></td>
+                                        <td><button type="button" @click="selectBillingList(item.id)" class="btn btn-block btn-primary btn-xs">Select</button></td>
                                     </tr>
                                 </template>
                             </tbody>

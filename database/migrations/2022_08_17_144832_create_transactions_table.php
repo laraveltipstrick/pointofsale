@@ -20,6 +20,8 @@ return new class extends Migration
             $table->integer('customer_id')->default(0);
             $table->string('name')->nullable();
             $table->integer('total');
+            $table->string('discount')->default(0);
+            $table->string('tax')->default(0);
             $table->integer('payment_id')->default(0);
             $table->boolean('status')->default(0); // 0. Pending, 1. Selesai
             $table->timestamps();
