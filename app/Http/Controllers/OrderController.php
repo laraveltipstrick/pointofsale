@@ -55,23 +55,46 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        $transaction = new Transaction;
-        $transaction->sales_type_id = $request->additional['sales_type'];
-        $transaction->user_id = Auth::id();
-        $transaction->name = $request->additional['customer_name'];
-        $transaction->total = $request->additional['total'];
-        $transaction->discount = $request->additional['discount'];
-        $transaction->tax = $request->additional['tax'];
-        $transaction->save();
-        
-        foreach ($request->item as $key => $value) {
-            $detail = new TransactionDetail;
-            $detail->transaction_id = $transaction->id;
-            $detail->product_id = $value['id'];
-            $detail->quantity = $value['qty'];
-            $detail->save();
+        if (!empty($request->additional['transaction_id'])) {
+            $transaction = Transaction::find($request->additional['transaction_id']);
+            $transaction->sales_type_id = $request->additional['sales_type'];
+            $transaction->name = $request->additional['customer_name'];
+            $transaction->total = $request->additional['total'];
+            $transaction->discount = $request->additional['discount'];
+            $transaction->tax = $request->additional['tax'];
+            $transaction->save();
+
+            TransactionDetail::where('transaction_id', $request->additional['transaction_id'])->delete();
+
+            foreach ($request->item as $key => $value) {
+                $detail = new TransactionDetail;
+                $detail->transaction_id = $request->additional['transaction_id'];
+                $detail->product_id = $value['id'];
+                $detail->quantity = $value['qty'];
+                $detail->save();
+            }
+
+            return response()->json($transaction);
+        } else {
+            $transaction = new Transaction;
+            $transaction->sales_type_id = $request->additional['sales_type'];
+            $transaction->user_id = Auth::id();
+            $transaction->name = $request->additional['customer_name'];
+            $transaction->total = $request->additional['total'];
+            $transaction->discount = $request->additional['discount'];
+            $transaction->tax = $request->additional['tax'];
+            $transaction->save();
+            
+            foreach ($request->item as $key => $value) {
+                $detail = new TransactionDetail;
+                $detail->transaction_id = $transaction->id;
+                $detail->product_id = $value['id'];
+                $detail->quantity = $value['qty'];
+                $detail->save();
+            }
+
+            return response()->json($transaction);
         }
 
-        return response()->json($transaction->save());
     }
 }

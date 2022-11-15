@@ -290,6 +290,7 @@
                         this.input.tax = 0
                         this.input.discount = 0
                         this.input.total = 0
+                        this.input.transaction_id = 0
                         $('#modal-save-bill').modal('hide')
                     }
                     console.log(this.newData)
@@ -414,6 +415,7 @@
                                 <div class="row">
                                     <div class="col-xs-12">
                                         <div class="btn-group btn-block btn-bill">
+                                            <button type="button" @click="cancel" class="btn btn-danger btn-flat">Cancel</button>
                                             <button type="button" @click="saveBill" class="btn btn-primary btn-flat">Save Bill</button>
                                             <button type="button" class="btn btn-warning btn-flat">Print Bill</button>
                                         </div>
